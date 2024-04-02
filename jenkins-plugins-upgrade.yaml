@@ -26,11 +26,20 @@
         msg: "{{ item }}"
       loop: "{{ plugin_info }}"
 
+    # - name: Check for plugin updates
+    #   command: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins --filter hasUpdate=true --short
+    #   register: plugins_updates
+    #   changed_when: false
+    #   ignore_errors: true
+
     - name: Check for plugin updates
-      command: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins --filter hasUpdate=true --short
-      register: plugins_updates
-      changed_when: false
-      ignore_errors: true
+      set_fact:
+        plugins_with_updates: "{{ plugin_info | json_query('[?contains(@, \'(update available)\')]') }}"
+
+    # - name: Upgrade plugins
+    #   command: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item.split(':')[0] }}' --deploy
+    #   loop: "{{ plugins_with_updates }}"
+    #   when: plugins_with_updates | length > 0
 
     # - name: Upgrade plugins
     #   command: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item.split(':')[0] }}' --deploy
