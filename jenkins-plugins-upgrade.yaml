@@ -28,7 +28,7 @@
 
     - name: Upgrade Jenkins plugins
        command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item }}' -deploy"
-       loop: "{{ installed_plugins.stdout_lines }}"
+       loop: "{{ plugin_info.stdout_lines }}"
        changed_when: true
     
     - name: Get installed plugins (after upgrade)
