@@ -1,0 +1,28 @@
+---
+- name: Upgrade Jenkins Plugins
+  hosts: localhost
+  become: true
+
+  vars:
+    jenkins_url: "ip-address"
+    jenkins_username: "nrk"
+    jenkins_password: "nrk"
+
+  tasks:
+    - name: Download Jenkins CLI jar
+      get_url:
+        url: "{{ jenkins_url }}/jnlpJars/jenkins-cli.jar"
+        dest: /tmp/jenkins-cli.jar
+
+    - name: Get installed plugins
+      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
+      register: installed_plugins
+
+    - name: Upgrade Jenkins plugins
+      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item.name }}' -deploy"
+      loop: "{{ installed_plugins.stdout_lines }}"
+      when: item.hasUpdate | bool
+
+    - name: Get installed plugins (after upgrade)
+      shell: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
+      register: installed_plugins_after
