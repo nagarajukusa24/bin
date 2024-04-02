@@ -1,9 +1,41 @@
 ---
-- name: Upgrade Jenkins Plugins
-  hosts: localhost
-  become: true
+# - name: Upgrade Jenkins Plugins
+#   hosts: localhost
+#   become: true
 
+#   vars:
+#     jenkins_url: "http://18.234.101.245:8080"
+#     jenkins_username: "nrk"
+#     jenkins_password: "nrk"
+
+#   tasks:
+#     - name: Download Jenkins CLI jar
+#       get_url:
+#         url: "{{ jenkins_url }}/jnlpJars/jenkins-cli.jar"
+#         dest: /tmp/jenkins-cli.jar
+
+#     - name: Get installed plugins
+#       command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
+#       register: installed_plugins
+
+#     - name: Create a Lists with Numbers, Strings and Dictionary
+#       set_fact:
+#         list_installed_plugins: "{{ installed_plugins | list }}"
+
+#     - name: Show all the hosts in the current play
+#       ansible.builtin.debug:
+#        msg: 
+#          - "{{ item }}"
+#       loop: "{{ list_installed_plugins.stdout }}"
+
+---
+- name: List Jenkins Plugins and Versions
+  hosts: localhost
+  gather_facts: false
   vars:
+    # jenkins_url: "http://52.40.132.220:8080"
+    # jenkins_username: "Master"
+    # jenkins_password: "Jenkins2Authentise!"
     jenkins_url: "http://18.234.101.245:8080"
     jenkins_username: "nrk"
     jenkins_password: "nrk"
@@ -14,19 +46,18 @@
         url: "{{ jenkins_url }}/jnlpJars/jenkins-cli.jar"
         dest: /tmp/jenkins-cli.jar
 
-    - name: Get installed plugins
-      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
-      register: installed_plugins
+    - name: List plugins and versions
+      shell: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins
+      register: plugins_output
 
-    - name: Create a Lists with Numbers, Strings and Dictionary
+    - name: Parse plugin names and versions
       set_fact:
-        list_installed_plugins: "{{ installed_plugins | list }}"
+        plugin_info: "{{ plugins_output.stdout_lines[1:] | map('regex_replace', '^([^ ]+)[^0-9]+([0-9].*)$', '\\1:\\2') | list }}"
 
-    - name: Show all the hosts in the current play
-      ansible.builtin.debug:
-       msg: 
-         - "{{ item }}"
-      loop: "{{ list_installed_plugins.stdout }}"
+    - name: Display plugin names and versions
+      debug:
+        msg: "{{ item }}"
+      loop: "{{ plugin_info }}"
 
 
 #    - name: Upgrade Jenkins plugins
