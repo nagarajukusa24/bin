@@ -39,3 +39,6 @@
       debug:
         msg: "{{ item }}"
       loop: "{{ installed_plugins_after.stdout_lines[1:] | map('regex_replace', '^([^ ]+)[^0-9]+([0-9].*)$', '\\1:\\2') | list }}"
+
+    - name: Restart Jenkins
+      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' safe-restart"
