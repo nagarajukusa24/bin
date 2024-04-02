@@ -1,41 +1,8 @@
-# ---
-# - name: Upgrade Jenkins Plugins
-#   hosts: localhost
-#   become: true
-
-#   vars:
-#     jenkins_url: "http://18.234.101.245:8080"
-#     jenkins_username: "nrk"
-#     jenkins_password: "nrk"
-
-#   tasks:
-#     - name: Download Jenkins CLI jar
-#       get_url:
-#         url: "{{ jenkins_url }}/jnlpJars/jenkins-cli.jar"
-#         dest: /tmp/jenkins-cli.jar
-
-#     - name: Get installed plugins
-#       command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
-#       register: installed_plugins
-
-#     - name: Create a Lists with Numbers, Strings and Dictionary
-#       set_fact:
-#         list_installed_plugins: "{{ installed_plugins | list }}"
-
-#     - name: Show all the hosts in the current play
-#       ansible.builtin.debug:
-#        msg: 
-#          - "{{ item }}"
-#       loop: "{{ list_installed_plugins.stdout }}"
-
 ---
 - name: List Jenkins Plugins and Versions
   hosts: localhost
   gather_facts: false
   vars:
-    # jenkins_url: "http://52.40.132.220:8080"
-    # jenkins_username: "Master"
-    # jenkins_password: "Jenkins2Authentise!"
     jenkins_url: "http://18.234.101.245:8080"
     jenkins_username: "nrk"
     jenkins_password: "nrk"
@@ -59,6 +26,16 @@
         msg: "{{ item }}"
       loop: "{{ plugin_info }}"
 
+    - name: Check for plugin updates
+      command: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins --filter hasUpdate=true --short
+      register: plugins_updates
+      changed_when: false
+      ignore_errors: true
+
+    # - name: Upgrade plugins
+    #   command: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item.split(':')[0] }}' --deploy
+    #   loop: "{{ plugins_updates.stdout_lines }}"
+    #   when: plugins_updates.stdout_lines | length > 0
 
 #    - name: Upgrade Jenkins plugins
 #      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item }}' -deploy"
