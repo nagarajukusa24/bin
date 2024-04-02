@@ -25,7 +25,8 @@
     - name: Show all the hosts in the current play
       ansible.builtin.debug:
        msg: 
-        - "{{ item.stdout }}"
+        - "{{ item.name }}"
+        - "{{ item.version }}"
       loop: "{{ list_installed_plugins }}"
 
 #    - name: Upgrade Jenkins plugins
