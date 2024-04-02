@@ -1,5 +1,5 @@
 ---
-- name: List Jenkins Plugins and Versions
+- name: Upgrade jenkins plugins
   hosts: localhost
   gather_facts: false
   vars:
@@ -9,36 +9,36 @@
 
   tasks:
     - name: Download Jenkins CLI jar
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ jenkins_url }}/jnlpJars/jenkins-cli.jar"
         dest: /tmp/jenkins-cli.jar
 
     - name: List plugins and versions
-      shell: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins
+      ansible.builtin.shell: java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins
       register: plugins_output
 
     - name: Parse plugin names and versions
-      set_fact:
+      ansible.builtin.set_fact:
         plugin_info: "{{ plugins_output.stdout_lines[1:] | map('regex_replace', '^([^ ]+)[^0-9]+([0-9].*)$', '\\1:\\2') | list }}"
 
     - name: Display plugin names and versions
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item }}"
       loop: "{{ plugin_info }}"
 
     - name: Upgrade Jenkins plugins
-      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item }}' -deploy"
+      ansible.builtin.command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item }}' -deploy"
       loop: "{{ plugin_info }}"
       changed_when: true
     
     - name: Get installed plugins (after upgrade)
-      shell: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
+      ansible.builtin.shell: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
       register: installed_plugins_after
     
     - name: Display plugin names and versions after upgradation
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item }}"
       loop: "{{ installed_plugins_after.stdout_lines[1:] | map('regex_replace', '^([^ ]+)[^0-9]+([0-9].*)$', '\\1:\\2') | list }}"
 
     - name: Restart Jenkins
-      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' safe-restart"
+      ansible.builtin.command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' safe-restart"
