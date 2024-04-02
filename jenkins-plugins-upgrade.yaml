@@ -25,7 +25,9 @@
     - name: Show all the hosts in the current play
       ansible.builtin.debug:
        msg: 
+         - "******************************************************************************"
          - "{{ item }}"
+         - "******************************************************************************"
         # - "{{ item.name }}"
         # - "{{ item.version }}"
       loop: "{{ list_installed_plugins }}"
