@@ -1,4 +1,4 @@
----
+# ---
 # - name: Upgrade Jenkins Plugins
 #   hosts: localhost
 #   become: true
