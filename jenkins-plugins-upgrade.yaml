@@ -1,7 +1,7 @@
 ---
 - name: Upgrade Jenkins Plugins
-  hosts: all
-  become: true
+  # hosts: all
+  # become: true
 
   vars:
     jenkins_url: "http://18.234.101.245:8080"
