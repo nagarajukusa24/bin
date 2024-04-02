@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    jenkins_url: "ip-address"
+    jenkins_url: "http://18.234.101.245:8080"
     jenkins_username: "nrk"
     jenkins_password: "nrk"
 
@@ -18,11 +18,22 @@
       command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
       register: installed_plugins
 
-    - name: Upgrade Jenkins plugins
-      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item.name }}' -deploy"
-      loop: "{{ installed_plugins.stdout_lines }}"
-      changed_when: true
+    - name: Create a Lists with Numbers, Strings and Dictionary
+      set_fact:
+        list_installed_plugins: "{{ installed_plugins }}"
 
-    - name: Get installed plugins (after upgrade)
-      shell: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
-      register: installed_plugins_after
+    - name: Show all the hosts in the current play
+      ansible.builtin.debug:
+       msg: 
+        - "{{ item.name }}"
+        - "{{ item.version }}"
+      loop: "{{ list_installed_plugins }}"
+
+#    - name: Upgrade Jenkins plugins
+#      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item }}' -deploy"
+#      loop: "{{ installed_plugins.stdout_lines }}"
+#      changed_when: true
+
+#    - name: Get installed plugins (after upgrade)
+#      shell: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' list-plugins"
+#      register: installed_plugins_after
