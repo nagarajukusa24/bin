@@ -27,7 +27,7 @@
        msg: 
         - "{{ item.name }}"
         - "{{ item.version }}"
-      loop: "{{ list_installed_plugins }}"
+      loop: "{{ list_installed_plugins | dict2items }}"
 
 #    - name: Upgrade Jenkins plugins
 #      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item }}' -deploy"
