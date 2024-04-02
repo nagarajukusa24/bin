@@ -20,7 +20,7 @@
 
     - name: Create a Lists with Numbers, Strings and Dictionary
       set_fact:
-        list_installed_plugins: "{{ installed_plugins }}"
+        list_installed_plugins: "{{ installed_plugins | list }}"
 
     - name: Show all the hosts in the current play
       ansible.builtin.debug:
