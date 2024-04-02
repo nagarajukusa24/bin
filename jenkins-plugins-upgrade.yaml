@@ -1,6 +1,6 @@
 ---
 - name: Upgrade Jenkins Plugins
-  # hosts: all
+  hosts: localhost
   # become: true
 
   vars:
