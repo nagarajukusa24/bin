@@ -30,7 +30,17 @@
          # - "{{ item.name }}"
          - "******************************************************************************"
         # - "{{ item.version }}"
-      loop: "{{ list_installed_plugins }}"
+      loop: "{{ installed_plugins }}"
+
+    - name: Show all the hosts in the current play 2222222222
+      ansible.builtin.debug:
+       msg: 
+         - "******************************************************************************"
+         - "{{ item }}"
+         # - "{{ item.name }}"
+         - "******************************************************************************"
+        # - "{{ item.version }}"
+      loop: "{{ installed_plugins | list }}"
 
 #    - name: Upgrade Jenkins plugins
 #      command: "java -jar /tmp/jenkins-cli.jar -s '{{ jenkins_url }}' -auth '{{ jenkins_username }}:{{ jenkins_password }}' install-plugin '{{ item }}' -deploy"
